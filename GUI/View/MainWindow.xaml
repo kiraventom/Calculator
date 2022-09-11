@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI.ViewModel"
-        xmlns:logic="clr-namespace:Logic;assembly=Logic"
+        xmlns:stateMachine="clr-namespace:Logic.StateMachine;assembly=Logic"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         Title="Calculator" 
         Width="350" MinWidth="350"
         Height="550" MinHeight="550">
@@ -37,7 +38,7 @@
 
             <TextBlock 
                 Grid.Row="0" 
-                Text="{Binding Old}"
+                Text="{Binding EnteredValue}"
                 FontSize="14"
                 Foreground="Gray"
                 TextAlignment="Right"
@@ -45,7 +46,7 @@
 
             <TextBlock 
                 Grid.Row="1"
-                Text="{Binding Current}"
+                Text="{Binding CurrentValue}"
                 FontSize="56"
                 VerticalAlignment="Bottom"
                 TextAlignment="Right"
@@ -73,122 +74,122 @@
             <Button 
                 Grid.Row="0" 
                 Grid.Column="0"
-                Tag="{x:Static logic:Input.Percent}">
+                Tag="{x:Static stateMachine:Input.Percent}">
             </Button>
             <Button 
                 Grid.Row="0" 
                 Grid.Column="1"
-                Tag="{x:Static logic:Input.Clear}">
+                Tag="{x:Static stateMachine:Input.Clear}">
             </Button>
             <Button 
                 Grid.Row="0" 
                 Grid.Column="2"
-                Tag="{x:Static logic:Input.ClearAll}">
+                Tag="{x:Static stateMachine:Input.ClearAll}">
             </Button>
             <Button 
                 Grid.Row="0" 
                 Grid.Column="3"
-                Tag="{x:Static logic:Input.Backspace}">
+                Tag="{x:Static stateMachine:Input.Backspace}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="0"
-                Tag="{x:Static logic:Input.OneByX}">
+                Tag="{x:Static stateMachine:Input.OneByX}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="1"
-                Tag="{x:Static logic:Input.SquarePower}">
+                Tag="{x:Static stateMachine:Input.SquarePower}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="2"
-                Tag="{x:Static logic:Input.SquareRoot}">
+                Tag="{x:Static stateMachine:Input.SquareRoot}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="3"
-                Tag="{x:Static logic:Input.Divide}">
+                Tag="{x:Static stateMachine:Input.Divide}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="0"
-                Tag="{x:Static logic:Input.Seven}">
+                Tag="{x:Static stateMachine:Input.Seven}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="1"
-                Tag="{x:Static logic:Input.Eight}">
+                Tag="{x:Static stateMachine:Input.Eight}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="2"
-                Tag="{x:Static logic:Input.Nine}">
+                Tag="{x:Static stateMachine:Input.Nine}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="3"
-                Tag="{x:Static logic:Input.Multiply}">
+                Tag="{x:Static stateMachine:Input.Multiply}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="0"
-                Tag="{x:Static logic:Input.Four}">
+                Tag="{x:Static stateMachine:Input.Four}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="1"
-                Tag="{x:Static logic:Input.Five}">
+                Tag="{x:Static stateMachine:Input.Five}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="2"
-                Tag="{x:Static logic:Input.Six}">
+                Tag="{x:Static stateMachine:Input.Six}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="3"
-                Tag="{x:Static logic:Input.Minus}">
+                Tag="{x:Static stateMachine:Input.Minus}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="0"
-                Tag="{x:Static logic:Input.Three}">
+                Tag="{x:Static stateMachine:Input.Three}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="1"
-                Tag="{x:Static logic:Input.Two}">
+                Tag="{x:Static stateMachine:Input.Two}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="2"
-                Tag="{x:Static logic:Input.One}">
+                Tag="{x:Static stateMachine:Input.One}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="3"
-                Tag="{x:Static logic:Input.Plus}">
+                Tag="{x:Static stateMachine:Input.Plus}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="0"
-                Tag="{x:Static logic:Input.Sign}">
+                Tag="{x:Static stateMachine:Input.Sign}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="1"
-                Tag="{x:Static logic:Input.Zero}">
+                Tag="{x:Static stateMachine:Input.Zero}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="2"
-                Tag="{x:Static logic:Input.Decimal}">
+                Tag="{x:Static stateMachine:Input.DecimalPoint}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="3"
-                Tag="{x:Static logic:Input.Equals}">
+                Tag="{x:Static stateMachine:Input.Equals}">
             </Button>
         </Grid>
     </Grid>

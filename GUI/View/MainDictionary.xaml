@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:local="clr-namespace:GUI.ViewModel"
                     mc:Ignorable="d">
     <Style x:Key="ButtonsGridStyle" TargetType="{x:Type Grid}">
@@ -9,8 +9,9 @@
             <local:ButtonContentConverter x:Key="ButtonContentConverter"/>
 
             <Style
-                d:DataContext="{local:CalculatorViewModel}"
+                d:DataContext="{d:DesignInstance local:CalculatorViewModel}"
                 TargetType="{x:Type Button}">
+
                 <Setter Property="FontSize" Value="23" />
                 <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Tag}"/>
                 <Setter Property="Command" Value="{Binding InputCommand}" />
