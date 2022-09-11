@@ -1,14 +1,9 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.DirectoryServices.ActiveDirectory;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows.Data;
-using System.Windows.Documents.DocumentStructures;
 using System.Windows.Input;
 using Common.Utils.Exceptions;
 using GUI.Annotations;
@@ -75,165 +70,86 @@ namespace GUI.ViewModel
 			get => _current;
 			private set => SetAndRaise(ref _current, value);
 		}
-
-		public ICommand NumberCommand { get; }
-		public ICommand OperationCommand { get; }
+		
+		public ICommand InputCommand { get; }
 
 		public CalculatorViewModel()
 		{
-			NumberCommand = new Command<int>(OnNumberPressed, CanNumberBePressed);
-			OperationCommand = new Command<Operation>(OnOperationPressed, CanOperationBePressed);
+			InputCommand = new Command<Input>(OnButtonPressed, IsButtonActive);
 		}
 
 		// TODO: Create state machine, move all logic to "engine"
-		private void OnOperationPressed(Operation operation)
+		private void OnButtonPressed(Input input)
 		{
-			switch (operation)
-			{
-				case Operation.Plus:
-				case Operation.Minus:
-				case Operation.Multiply:
-				case Operation.Divide:
-					Old = Current + OperationConverter.ConvertBack(operation);
-					Current = null;
-					break;
-
-				case Operation.Equals:
-					Old += Current + OperationConverter.ConvertBack(Operation.Equals);
-					Current = Calculator.Calculate(new Expression()).Value.ToString();
-					break;
-
-				case Operation.OneByX:
-					break;
-
-				case Operation.Clear:
-					Current = null;
-					break;
-
-				case Operation.ClearAll:
-					Old = null;
-					Current = null;
-					break;
-
-				case Operation.Backspace:
-					Current = Current.Remove(Current.Length - 1, 1);
-					break;
-
-				case Operation.Percent:
-					break;
-
-				case Operation.Power:
-					break;
-
-				case Operation.Root:
-					break;
-
-				case Operation.Sign:
-					break;
-
-				case Operation.Decimal:
-					break;
-
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
+			
 		}
-
-		// TODO: Numbers like 00000
-		private void OnNumberPressed(int number)
+		
+		private bool IsButtonActive(Input input)
 		{
-			Current += number;
-		}
-
-		private bool CanOperationBePressed(Operation operation)
-		{
-			return operation switch
-			{
-				Operation.Plus => true,
-				Operation.Minus => true,
-				Operation.Multiply => true,
-				Operation.Divide => true,
-				Operation.Equals => true,
-				Operation.OneByX => false,
-				Operation.Clear => true,
-				Operation.ClearAll => true,
-				Operation.Backspace => true,
-				Operation.Percent => false,
-				Operation.Power => false,
-				Operation.Root => false,
-				Operation.Sign => false,
-				Operation.Decimal => false,
-				_ => throw new ArgumentOutOfRangeException(nameof(operation), operation, null)
-			};
-		}
-
-		private bool CanNumberBePressed(int number)
-		{
-			return number is >= 0 and < 10;
+			return true;
 		}
 	}
 
-	public class OperationConverter : IValueConverter
+	internal static class DigitInputToNumberConverter
 	{
-		private static readonly OperationConverter Instance = new();
-
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public static int Convert(Input input)
 		{
-			var operationString = (string)value;
-			return operationString switch
+			if (!Input.Digit.HasFlag(input))
+				throw new NotSupportedException($"{input} is not a {Input.Digit}");
+
+			return input switch
 			{
-				"+" => Operation.Plus,
-				"-" => Operation.Minus,
-				"×" => Operation.Multiply,
-				"÷" => Operation.Divide,
-				"1÷x" => Operation.OneByX,
-				"=" => Operation.Equals,
-				"CE" => Operation.Clear,
-				"C" => Operation.ClearAll,
-				"⇍" => Operation.Backspace,
-				"%" => Operation.Percent,
-				"x²" => Operation.Power,
-				"√x" => Operation.Root,
-				"±" => Operation.Sign,
-				"." => Operation.Decimal,
-				_ => throw new ArgumentOutOfRangeException(nameof(value), value, $"Unknown operation {value}")
+				Input.Zero => 0,
+				Input.One => 1,
+				Input.Two => 2,
+				Input.Three => 3,
+				Input.Four => 4,
+				Input.Five => 5,
+				Input.Six => 6,
+				Input.Seven => 7,
+				Input.Eight => 8,
+				Input.Nine => 9,
+				_ => throw new NotSupportedException($"Input {input} has no int interpretation")
 			};
 		}
-
-		public static Operation Convert(string parameter) => (Operation)Instance.Convert(parameter, typeof(string), null, CultureInfo.InvariantCulture);
-
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			var operation = (Operation)value;
-			return operation switch
-			{
-				Operation.Plus => "+",
-				Operation.Minus => "-",
-				Operation.Multiply => "×",
-				Operation.Divide => "÷",
-				Operation.OneByX => "1÷x",
-				Operation.Equals => "=",
-				Operation.Clear => "CE",
-				Operation.ClearAll => "C",
-				Operation.Backspace => "⇍",
-				Operation.Percent => "%",
-				Operation.Power => "x²",
-				Operation.Root => "√x",
-				Operation.Sign => "±",
-				Operation.Decimal => ".",
-				_ => throw new ArgumentOutOfRangeException(nameof(value), value, $"Unknown operation {value}")
-			};
-		}
-
-		public static string ConvertBack(Operation parameter) => (string)Instance.ConvertBack(parameter, typeof(string), null, CultureInfo.InvariantCulture);
 	}
 
-	public class NumberConverter : IValueConverter
+	internal static class InputToStringConverter
+	{
+		public static string Convert(Input input)
+		{
+			if (Input.Digit.HasFlag(input))
+				return DigitInputToNumberConverter.Convert(input).ToString();
+
+			return input switch
+			{
+				Input.Plus => "+",
+				Input.Minus => "-",
+				Input.Multiply => "×",
+				Input.Divide => "÷",
+				Input.Equals => "=",
+				Input.OneByX => "1÷x",
+				Input.Percent => "%",
+				Input.SquarePower => "x²",
+				Input.SquareRoot => "√x",
+				Input.Sign => "±",
+				Input.Decimal => ".",
+				Input.Clear => "CE",
+				Input.ClearAll => "C",
+				Input.Backspace => "⇍",
+
+				_ => throw new NotSupportedException($"Input {input} has no string interpretation")
+			};
+		}
+	}
+
+	[ValueConversion(typeof(Input), typeof(string))]
+	public class ButtonContentConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			var numberString = (string)value;
-			return int.TryParse(numberString, out var number) ? number : throw new NotSupportedException();
+			ArgumentTypeException.ThrowIfNotTypeOf(value, out Input input);
+			return InputToStringConverter.Convert(input);
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI.ViewModel"
+        xmlns:logic="clr-namespace:Logic;assembly=Logic"
         mc:Ignorable="d"
         Title="Calculator" 
         Width="350" MinWidth="350"
@@ -18,9 +19,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="MainDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <local:OperationConverter x:Key="OperationConverter" />
-            <local:NumberConverter x:Key="NumberConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -75,170 +73,122 @@
             <Button 
                 Grid.Row="0" 
                 Grid.Column="0"
-                Content="%" 
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Percent}">
             </Button>
             <Button 
                 Grid.Row="0" 
                 Grid.Column="1"
-                Content="CE"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Clear}">
             </Button>
             <Button 
                 Grid.Row="0" 
                 Grid.Column="2"
-                Content="C"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.ClearAll}">
             </Button>
             <Button 
                 Grid.Row="0" 
                 Grid.Column="3"
-                Content="⇍"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Backspace}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="0"
-                Content="1÷x"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.OneByX}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="1"
-                Content="x²"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.SquarePower}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="2"
-                Content="√x"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.SquareRoot}">
             </Button>
             <Button 
                 Grid.Row="1" 
                 Grid.Column="3"
-                Content="÷"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Divide}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="0"
-                Content="7"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Seven}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="1"
-                Content="8"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Eight}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="2"
-                Content="9"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Nine}">
             </Button>
             <Button 
                 Grid.Row="2" 
                 Grid.Column="3"
-                Content="×"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Multiply}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="0"
-                Content="4"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Four}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="1"
-                Content="5"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Five}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="2"
-                Content="6"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Six}">
             </Button>
             <Button 
                 Grid.Row="3" 
                 Grid.Column="3"
-                Content="-"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Minus}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="0"
-                Content="3"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Three}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="1"
-                Content="2"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Two}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="2"
-                Content="1"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.One}">
             </Button>
             <Button 
                 Grid.Row="4" 
                 Grid.Column="3"
-                Content="+"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Plus}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="0"
-                Content="±"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Sign}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="1"
-                Content="0"
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource NumberConverter}}"
-                Command="{Binding NumberCommand}">
+                Tag="{x:Static logic:Input.Zero}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="2"
-                Content="."
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Decimal}">
             </Button>
             <Button 
                 Grid.Row="5" 
                 Grid.Column="3"
-                Content="="
-                CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content, Converter={StaticResource OperationConverter}}"
-                Command="{Binding OperationCommand}">
+                Tag="{x:Static logic:Input.Equals}">
             </Button>
         </Grid>
     </Grid>
