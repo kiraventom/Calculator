@@ -116,20 +116,21 @@ public class StateMachine
 
 	private State GetCurrentState()
 	{
-		return (CurrentOperandString.Length == 0) switch
+		var currentOperandIsEmpty = CurrentOperandString.Length == 0;
+		return (currentOperandIsEmpty) switch
 		{
 			true when EnteredOperandString.Length == 0 => State.WaitingForFirstOperand,
 			true when EnteredOperandString.Length != 0 => State.WaitingForSecondOperand,
 			false when EnteredOperandString.Length == 0 => State.EnteringFirstOperandOrOperation,
-			false when EnteredOperandString.Length != 0 => State.EnteringSecondOperandOrEquals,
 			false when EnteredOperandString.Length != 0 && ResultIsReady => State.ShowingResult,
+			false when EnteredOperandString.Length != 0 => State.EnteringSecondOperandOrEquals,
 			_ => throw new NotSupportedException("Can't figure out current state")
 		};
 	}
 
 	private Input GetAllowedInput(State state)
 	{
-		Input allowedInput = Input.None;
+		var allowedInput = Input.None;
 
 		switch (state)
 		{
