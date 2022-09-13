@@ -1,4 +1,4 @@
-﻿using Logic.Converters;
+﻿using System.Text;
 
 namespace Logic.StateMachine;
 
@@ -43,10 +43,3 @@ public enum Input
 	Backspace = 1 << 24
 }
 
-public static class InputExtensions
-{
-	public static bool Is(this Input input, Input complexInput) => input != Input.None && complexInput.HasFlag(input);
-	public static bool IsNot(this Input input, Input complexInput) => !input.Is(complexInput);
-
-	public static string AsString(this Input input) => InputToStringConverter.Convert(input);
-}

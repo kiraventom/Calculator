@@ -4,6 +4,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Common.Utils.Exceptions;
 using GUI.ViewModel.Common;
+using Logic;
 using Logic.StateMachine;
 
 namespace GUI.ViewModel
@@ -13,26 +14,22 @@ namespace GUI.ViewModel
 		private readonly StateMachine _stateMachine;
 		private readonly Command<Input> _inputCommand;
 
-		public string EnteredValue
-		{
-			get
-			{
-				var str = _stateMachine.EnteredOperandString + ' ' + _stateMachine.BinaryOperation.AsString();
+		public string EnteredValue => _stateMachine.ResultIsReady ? 
+				$"{_stateMachine.EnteredOperand} {_stateMachine.BinaryOperation.AsString()} {_stateMachine.CurrentOperand} {Input.Equals.AsString()}" : 
+				$"{_stateMachine.EnteredOperand} {_stateMachine.BinaryOperation.AsString()}";
 
-				if (_stateMachine.ResultIsReady) 
-					str += ' ' + _stateMachine.CurrentOperandString;
-
-				return str;
-			}
-		}
-
-		public string CurrentValue => _stateMachine.ResultIsReady ? _stateMachine.Result.ToString(CultureInfo.InvariantCulture) : _stateMachine.CurrentOperandString;
+		public string CurrentValue => _stateMachine.ResultIsReady ? 
+			_stateMachine.Answer.Value.ToString(CultureInfo.InvariantCulture) : 
+			_stateMachine.CurrentOperand;
 
 		public ICommand InputCommand => _inputCommand;
 
 		public CalculatorViewModel()
 		{
 			_stateMachine = new StateMachine();
+			_stateMachine.CurrentOperandChanged += () => RaisePropertyChanged(nameof(CurrentValue));
+			_stateMachine.EnteredOperandChanged += () => RaisePropertyChanged(nameof(EnteredValue));
+			_stateMachine.OperationChanged += () => RaisePropertyChanged(nameof(EnteredValue));
 			_inputCommand = new Command<Input>(OnButtonPressed, IsButtonActive);
 		}
 		
@@ -41,6 +38,7 @@ namespace GUI.ViewModel
 			_stateMachine.ReceiveInput(input);
 			RaisePropertyChanged(nameof(EnteredValue));
 			RaisePropertyChanged(nameof(CurrentValue));
+			
 			_inputCommand.RaiseCanExecuteChanged();
 		}
 

@@ -36,21 +36,27 @@
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock 
-                Grid.Row="0" 
-                Text="{Binding EnteredValue}"
-                FontSize="14"
-                Foreground="Gray"
-                TextAlignment="Right"
-                Padding="0, 10, 10, 0"/>
+            <Viewbox
+                Grid.Row="0"
+                HorizontalAlignment="Right">
+                <TextBlock 
+                    Text="{Binding EnteredValue}"
+                    FontSize="14"
+                    Foreground="Gray"
+                    TextAlignment="Right"
+                    Padding="0, 10, 10, 0"/>
+            </Viewbox>
 
-            <TextBlock 
+            <Viewbox
                 Grid.Row="1"
-                Text="{Binding CurrentValue}"
-                FontSize="56"
-                VerticalAlignment="Bottom"
-                TextAlignment="Right"
-                Padding="0, 0, 10, 10"/>
+                HorizontalAlignment="Right">
+                <TextBlock 
+                    Text="{Binding CurrentValue}"
+                    FontSize="56"
+                    VerticalAlignment="Bottom"
+                    TextAlignment="Right"
+                    Padding="0, 0, 10, 10"/>
+            </Viewbox>
         </Grid>
 
         <Grid

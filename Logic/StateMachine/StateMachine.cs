@@ -6,34 +6,67 @@ public enum State
 {
 	WaitingForFirstOperand,
 	EnteringFirstOperandOrOperation,
+	FirstOperandReachedMaxLength,
 	WaitingForSecondOperand,
 	EnteringSecondOperandOrEquals,
+	SecondOperandReachedMaxLength,
 	ShowingResult,
 }
 
 public class StateMachine
 {
-	// TODO: Replace operand strings with StringBuilders
-	public string EnteredOperandString { get; private set; } = string.Empty;
-	public string CurrentOperandString { get; private set; } = string.Empty;
+	private const int MaxOperandLength = 10;
+	
+	private readonly ObservableStringBuilder _enteredOperand;
+	private readonly ObservableStringBuilder _currentOperand;
+	private Input _binaryOperation = Input.None;
+	private State _currentState;
 
-	public Input BinaryOperation { get; private set; } = Input.None;
-	public bool ResultIsReady { get; private set; }
+	public Input BinaryOperation
+	{
+		get => _binaryOperation;
+		private set
+		{
+			var oldValue = _binaryOperation;
+			_binaryOperation = value;
+			if (oldValue != _binaryOperation)
+				OperationChanged?.Invoke();
+		}
+	}
 
-	// TODO fix this
-	public double EnteredOperand => double.TryParse(EnteredOperandString, NumberStyles.Any, CultureInfo.InvariantCulture, out var result)
-		? result
-		: double.NaN;
+	public bool ResultIsReady => Answer is not null;
 
-	public double CurrentOperand => double.TryParse(CurrentOperandString, NumberStyles.Any, CultureInfo.InvariantCulture, out var result) 
-		? result
-		: double.NaN;
+	public Answer Answer { get; private set; }
 
-	public double Result { get; private set; }
+	public State CurrentState
+	{
+		get => _currentState;
+		private set
+		{
+			_currentState = value;
+			AllowedInput = GetAllowedInput(_currentState);
+		}
+	}
 
-	public State CurrentState => GetCurrentState();
+	public Input AllowedInput { get; private set; }
 
-	public Input AllowedInput => GetAllowedInput(CurrentState);
+	public string EnteredOperand => _enteredOperand.ToString();
+	public string CurrentOperand => _currentOperand.ToString();
+
+	public event Action EnteredOperandChanged;
+	public event Action CurrentOperandChanged;
+	public event Action OperationChanged;
+
+	public StateMachine()
+	{
+		_enteredOperand = new ObservableStringBuilder();
+		_currentOperand = new ObservableStringBuilder();
+
+		CurrentState = State.WaitingForFirstOperand;
+
+		_enteredOperand.ValueChanged += () => EnteredOperandChanged?.Invoke();
+		_currentOperand.ValueChanged += () => CurrentOperandChanged?.Invoke();
+	}
 
 	public void ReceiveInput(Input input)
 	{
@@ -58,7 +91,7 @@ public class StateMachine
 			case Input.Eight:
 			case Input.Nine:
 			case Input.DecimalPoint:
-				CurrentOperandString += input.AsString();
+				_currentOperand.Append(input.AsString());
 				break;
 
 			case Input.Plus:
@@ -66,14 +99,15 @@ public class StateMachine
 			case Input.Multiply:
 			case Input.Divide:
 				BinaryOperation = input;
-				EnteredOperandString = CurrentOperandString;
-				CurrentOperandString = string.Empty;
+				_enteredOperand.Append(_currentOperand);
+				_currentOperand.Clear();
 				break;
 
 			case Input.Equals:
-				var expression = new Expression(EnteredOperand, CurrentOperand, BinaryOperation);
-				Result = Calculator.Calculate(expression).Value;
-				ResultIsReady = true;
+				var secondOperand = double.Parse(_currentOperand.ToString(), NumberStyles.Any);
+				var firstOperand = double.Parse(_enteredOperand.ToString(), NumberStyles.Any);
+				var expression = new Expression(firstOperand, secondOperand, BinaryOperation);
+				Answer = Calculator.Calculate(expression);
 				break;
 				
 			case Input.OneByX:
@@ -84,46 +118,48 @@ public class StateMachine
 				break;
 
 			case Input.Sign:
-				CurrentOperandString = CurrentOperand switch
-				{
-					> 0 => CurrentOperandString.Insert(0, Input.Minus.AsString()),
-					< 0 => CurrentOperandString[1..],
-					_ => CurrentOperandString
-				};
+				if (_currentOperand[0] == Input.Minus.AsChar())
+					_currentOperand.Remove(0, 1);
+				else
+					_currentOperand.Insert(0, Input.Minus.AsChar());
 
 				break;
 				
 			case Input.Clear:
-				CurrentOperandString = string.Empty;
+				_currentOperand.Clear();
 
 				break;
 			case Input.ClearAll:
-				CurrentOperandString = string.Empty;
-				EnteredOperandString = string.Empty;
-				Result = double.MinValue;
-				ResultIsReady = false;
+				_currentOperand.Clear();
+				_enteredOperand.Clear();
+				Answer = null;
 				BinaryOperation = Input.None;
 				break;
 
 			case Input.Backspace:
-				CurrentOperandString = CurrentOperandString[..^1];
+				_currentOperand.Remove(_currentOperand.Length - 1, 1);
+				if (_currentOperand.Length == 1 && _currentOperand[0] == Input.Minus.AsChar())
+					_currentOperand.Clear();
 				break;
 
 			default:
 				throw new NotSupportedException($"Don't know how to process input {input}");
 		}
+
+		CurrentState = GetCurrentState();
 	}
 
 	private State GetCurrentState()
 	{
-		var currentOperandIsEmpty = CurrentOperandString.Length == 0;
-		return (currentOperandIsEmpty) switch
+		return (_currentOperand.Length) switch
 		{
-			true when EnteredOperandString.Length == 0 => State.WaitingForFirstOperand,
-			true when EnteredOperandString.Length != 0 => State.WaitingForSecondOperand,
-			false when EnteredOperandString.Length == 0 => State.EnteringFirstOperandOrOperation,
-			false when EnteredOperandString.Length != 0 && ResultIsReady => State.ShowingResult,
-			false when EnteredOperandString.Length != 0 => State.EnteringSecondOperandOrEquals,
+			> 0 when _enteredOperand.Length > 0 && ResultIsReady => State.ShowingResult,
+			>= MaxOperandLength when  _enteredOperand.Length == 0 => State.FirstOperandReachedMaxLength,
+			>= MaxOperandLength when  _enteredOperand.Length > 0 => State.SecondOperandReachedMaxLength,
+			0 when _enteredOperand.Length == 0 => State.WaitingForFirstOperand,
+			0 when _enteredOperand.Length > 0 => State.WaitingForSecondOperand,
+			> 0 when _enteredOperand.Length == 0 => State.EnteringFirstOperandOrOperation,
+			> 0 when _enteredOperand.Length > 0 => State.EnteringSecondOperandOrEquals,
 			_ => throw new NotSupportedException("Can't figure out current state")
 		};
 	}
@@ -146,15 +182,15 @@ public class StateMachine
 				allowedInput |= Input.Erasing | Input.Sign;
 
 				// if there is no decimal point, can add decimal point
-				if (!CurrentOperandString.Contains(Input.DecimalPoint.AsString()))
+				if (!_currentOperand.Contains(Input.DecimalPoint.AsChar()))
 					allowedInput |= Input.DecimalPoint;
 
 				// if operand does not end on decimal point, can use binary operation
-				if (!CurrentOperandString.EndsWith(Input.DecimalPoint.AsString()))
+				if (_currentOperand[^1] != Input.DecimalPoint.AsChar())
 					allowedInput |= Input.BinaryOperation;
 
 				// if operand is not equal to 0 or ends with decimal point, can add digit
-				if (Math.Abs(CurrentOperand) != 0 || CurrentOperandString.EndsWith(Input.DecimalPoint.AsString()))
+				if (!_currentOperand.Equals(Input.Zero.AsString()) || _currentOperand[^1] == Input.DecimalPoint.AsChar())
 					allowedInput |= Input.Digit;
 				break;
 				
@@ -162,17 +198,32 @@ public class StateMachine
 				allowedInput |= Input.Erasing | Input.Sign;
 
 				// if there is no decimal point, can add decimal point
-				if (!CurrentOperandString.Contains(Input.DecimalPoint.AsString()))
+				if (!_currentOperand.Contains(Input.DecimalPoint.AsChar()))
 					allowedInput |= Input.DecimalPoint;
-
-				// TODO fix division on zero
+				
 				// if operand does not end on decimal point, can use equals
-				if (!CurrentOperandString.EndsWith(Input.DecimalPoint.AsString()))
+				if (_currentOperand[^1] != Input.DecimalPoint.AsChar())
 					allowedInput |= Input.Equals;
 
 				// if operand is not equal to 0 or ends with decimal point, can add digit
-				if (Math.Abs(CurrentOperand) != 0 || CurrentOperandString.EndsWith(Input.DecimalPoint.AsString()))
+				if (!_currentOperand.Equals(Input.Zero.AsString()) || _currentOperand[^1] == Input.DecimalPoint.AsChar())
 					allowedInput |= Input.Digit;
+				break;
+
+			case State.FirstOperandReachedMaxLength:
+				allowedInput |= Input.Erasing | Input.Sign;
+
+				if (_currentOperand[^1] != Input.DecimalPoint.AsChar())
+					allowedInput |= Input.BinaryOperation;
+
+				break;
+
+			case State.SecondOperandReachedMaxLength:
+				allowedInput |= Input.Erasing | Input.Sign;
+
+				if (_currentOperand[^1] != Input.DecimalPoint.AsChar())
+					allowedInput |= Input.Equals;
+
 				break;
 
 			case State.ShowingResult:
