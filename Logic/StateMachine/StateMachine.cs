@@ -15,7 +15,7 @@ public enum State
 
 public class StateMachine
 {
-	private const int MaxOperandLength = 10;
+	private const int MaxOperandLength = 12;
 	
 	private readonly ObservableStringBuilder _enteredOperand;
 	private readonly ObservableStringBuilder _currentOperand;

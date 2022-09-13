@@ -24,6 +24,8 @@ namespace GUI.ViewModel
 
 		public ICommand InputCommand => _inputCommand;
 
+		public int Latency { get; set; } = 2;
+
 		public CalculatorViewModel()
 		{
 			_stateMachine = new StateMachine();
