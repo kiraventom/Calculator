@@ -104,8 +104,8 @@ public class StateMachine
 				break;
 
 			case Input.Equals:
-				var secondOperand = double.Parse(_currentOperand.ToString(), NumberStyles.Any);
-				var firstOperand = double.Parse(_enteredOperand.ToString(), NumberStyles.Any);
+				var secondOperand = double.Parse(_currentOperand.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
+				var firstOperand = double.Parse(_enteredOperand.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture);
 				var expression = new Expression(firstOperand, secondOperand, BinaryOperation);
 				Answer = Calculator.Calculate(expression);
 				break;
@@ -190,7 +190,7 @@ public class StateMachine
 					allowedInput |= Input.BinaryOperation;
 
 				// if operand is not equal to 0 or ends with decimal point, can add digit
-				if (!_currentOperand.Equals(Input.Zero.AsString()) || _currentOperand[^1] == Input.DecimalPoint.AsChar())
+				if (!_currentOperand.Equals(Input.Zero.AsString()))
 					allowedInput |= Input.Digit;
 				break;
 				
